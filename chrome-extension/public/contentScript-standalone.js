@@ -32,87 +32,127 @@ if (!window.__SCAMSTOP_CONTENT_LOADED__) {
             let riskScore = 0;
             let reasons = [];
 
-            // Check 1: Suspicious TLDs
-            const suspiciousTLDs = ['.xyz', '.top', '.work', '.click', '.link', '.download', '.stream', '.review'];
+            // Check 1: Suspicious TLDs (expanded list)
+            const suspiciousTLDs = [
+                '.xyz', '.top', '.work', '.click', '.link', '.download', '.stream', '.review',
+                '.loan', '.win', '.bid', '.racing', '.accountant', '.science', '.party',
+                '.gq', '.ml', '.cf', '.ga', '.tk', '.zip', '.mov', '.cm'
+            ];
             if (suspiciousTLDs.some(tld => urlObj.hostname.endsWith(tld))) {
-                riskScore += 30;
-                reasons.push('Suspicious domain extension');
+                riskScore += 35;
+                reasons.push('⚠️ Suspicious domain extension (commonly used in scams)');
             }
 
             // Check 2: IP address instead of domain
             if (/^\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}$/.test(urlObj.hostname)) {
-                riskScore += 40;
-                reasons.push('Direct IP address (unusual)');
+                riskScore += 45;
+                reasons.push('🚨 Direct IP address detected (highly unusual for legitimate sites)');
             }
 
             // Check 3: Excessive subdomains
             const subdomains = urlObj.hostname.split('.');
             if (subdomains.length > 4) {
-                riskScore += 25;
-                reasons.push('Too many subdomains');
+                riskScore += 30;
+                reasons.push('⚠️ Too many subdomains (obfuscation tactic)');
             }
 
             // Check 4: Suspicious keywords in URL
             const suspiciousKeywords = [
                 'verify', 'account', 'suspended', 'urgent', 'secure', 'update',
                 'login', 'signin', 'banking', 'paypal', 'ebay', 'amazon',
-                'password', 'credential', 'confirm', 'billing'
+                'password', 'credential', 'confirm', 'billing', 'wallet',
+                'refund', 'claim', 'prize', 'winner', 'validate', 'restore'
             ];
             const urlLower = url.toLowerCase();
             const foundKeywords = suspiciousKeywords.filter(kw => urlLower.includes(kw));
-            if (foundKeywords.length > 0) {
-                riskScore += foundKeywords.length * 15;
-                reasons.push(`Contains suspicious words: ${foundKeywords.join(', ')}`);
-            }
-
-            // Check 5: Look for brand impersonation
-            const brands = ['google', 'facebook', 'microsoft', 'apple', 'amazon', 'paypal', 'netflix'];
-            const hasBrandInSubdomain = brands.some(brand => {
-                const parts = urlObj.hostname.split('.');
-                // Remove the actual domain
-                const mainDomain = parts.slice(-2).join('.');
-                const subdomainPart = parts.slice(0, -2).join('.');
-                return subdomainPart.includes(brand) && !mainDomain.includes(brand);
-            });
-            if (hasBrandInSubdomain) {
-                riskScore += 50;
-                reasons.push('Possible brand impersonation in subdomain');
-            }
-
-            // Check 6: URL shorteners (could hide malicious links)
-            const shorteners = ['bit.ly', 'tinyurl.com', 'goo.gl', 't.co', 'ow.ly', 'is.gd'];
-            if (shorteners.some(s => urlObj.hostname.includes(s))) {
-                riskScore += 20;
-                reasons.push('URL shortener (destination hidden)');
-            }
-
-            // Check 7: Homograph attacks (lookalike characters)
-            if (/[а-яА-Я]/.test(urlObj.hostname)) { // Cyrillic characters
-                riskScore += 60;
-                reasons.push('Contains lookalike characters (homograph attack)');
-            }
-
-            // Check 8: Excessive hyphens
-            if ((urlObj.hostname.match(/-/g) || []).length > 3) {
-                riskScore += 20;
-                reasons.push('Excessive hyphens in domain');
-            }
-
-            // Check 9: Very long URLs (often used to hide malicious content)
-            if (url.length > 200) {
+            if (foundKeywords.length >= 2) {
+                riskScore += foundKeywords.length * 20;
+                reasons.push(`🚨 Multiple suspicious keywords: ${foundKeywords.join(', ')}`);
+            } else if (foundKeywords.length === 1) {
                 riskScore += 15;
-                reasons.push('Unusually long URL');
+                reasons.push(`⚠️ Suspicious keyword: ${foundKeywords[0]}`);
             }
 
-            // Check 10: Mismatched protocol (http for login pages)
+            // Check 5: Brand impersonation (improved detection)
+            const brandPatterns = {
+                'google': ['google.com', 'gmail.com', 'youtube.com'],
+                'facebook': ['facebook.com', 'fb.com'],
+                'microsoft': ['microsoft.com', 'outlook.com', 'live.com', 'office.com'],
+                'apple': ['apple.com', 'icloud.com'],
+                'amazon': ['amazon.com', 'aws.amazon.com'],
+                'paypal': ['paypal.com'],
+                'netflix': ['netflix.com'],
+                'bank': ['bankofamerica.com', 'chase.com', 'wellsfargo.com', 'citibank.com']
+            };
+
+            for (const [brand, legitimateDomains] of Object.entries(brandPatterns)) {
+                const hostname = urlObj.hostname.toLowerCase();
+                // Check if brand name appears but not in legitimate domain
+                if (hostname.includes(brand) && !legitimateDomains.some(d => hostname.endsWith(d))) {
+                    riskScore += 55;
+                    reasons.push(`🚨 Possible ${brand} impersonation - not official domain!`);
+                    break;
+                }
+            }
+
+            // Check 6: Typosquatting detection (common misspellings)
+            const typosquatPatterns = [
+                /g[o0]{2}gle/, /faceb[o0]{2}k/, /micr[o0]s[o0]ft/, /paypa[il]/,
+                /amaz[o0]n/, /netfl[i1]x/, /app[i1]e/, /tw[i1]tter/
+            ];
+            if (typosquatPatterns.some(pattern => pattern.test(urlObj.hostname))) {
+                riskScore += 60;
+                reasons.push('🚨 Typosquatting detected - misspelled brand name!');
+            }
+
+            // Check 7: URL shorteners (could hide malicious links)
+            const shorteners = ['bit.ly', 'tinyurl.com', 'goo.gl', 't.co', 'ow.ly', 'is.gd', 'buff.ly', 'adf.ly'];
+            if (shorteners.some(s => urlObj.hostname.includes(s))) {
+                riskScore += 25;
+                reasons.push('⚠️ URL shortener (true destination hidden)');
+            }
+
+            // Check 8: Homograph attacks (lookalike characters)
+            if (/[а-яА-Я]/.test(urlObj.hostname)) { // Cyrillic characters
+                riskScore += 65;
+                reasons.push('🚨 Homograph attack - contains lookalike characters!');
+            }
+
+            // Check 9: Excessive hyphens or underscores
+            const specialChars = (urlObj.hostname.match(/[-_]/g) || []).length;
+            if (specialChars > 3) {
+                riskScore += 25;
+                reasons.push('⚠️ Excessive hyphens/underscores in domain');
+            }
+
+            // Check 10: Very long URLs (often used to hide malicious content)
+            if (url.length > 200) {
+                riskScore += 20;
+                reasons.push('⚠️ Unusually long URL (possible obfuscation)');
+            }
+
+            // Check 11: Mismatched protocol (http for login pages)
             if (urlObj.protocol === 'http:' && suspiciousKeywords.some(kw => urlLower.includes(kw))) {
-                riskScore += 30;
-                reasons.push('Insecure HTTP for sensitive page');
+                riskScore += 35;
+                reasons.push('🚨 Insecure HTTP for sensitive page (should be HTTPS)');
+            }
+
+            // Check 12: Suspicious port numbers
+            if (urlObj.port && !['80', '443', '8080', ''].includes(urlObj.port)) {
+                riskScore += 20;
+                reasons.push(`⚠️ Unusual port number: ${urlObj.port}`);
+            }
+
+            // Check 13: Query string manipulation (common in phishing)
+            const queryParams = new URLSearchParams(urlObj.search);
+            if (queryParams.has('redirect') || queryParams.has('url') || queryParams.has('next')) {
+                riskScore += 15;
+                reasons.push('⚠️ Contains redirect parameter (possible phishing)');
             }
 
             return {
                 score: Math.min(riskScore, 100),
-                isRisky: riskScore >= 50,
+                isRisky: riskScore >= 40, // Lower threshold for better detection
                 reasons: reasons
             };
         } catch (error) {
@@ -192,10 +232,97 @@ if (!window.__SCAMSTOP_CONTENT_LOADED__) {
         }
     }
 
-    // Highlight risky links on the page
+    // Find the email container for a given element (Gmail-specific)
+    function findEmailContainer(element) {
+        let current = element;
+        let attempts = 0;
+        const maxAttempts = 15;
+
+        while (current && current !== document.body && attempts < maxAttempts) {
+            // Gmail email row selectors
+            if (current.matches && (
+                current.matches('tr.zA') || // Gmail inbox row
+                current.matches('div[role="listitem"]') || // Gmail list item
+                current.matches('div.ae4') || // Gmail email container
+                current.matches('div[data-message-id]') || // Email with message ID
+                current.classList.contains('gs') || // Gmail message
+                current.classList.contains('ii') // Gmail message body
+            )) {
+                return current;
+            }
+            current = current.parentElement;
+            attempts++;
+        }
+        return null;
+    }
+
+    // Mark an email container as suspicious
+    function markSuspiciousEmail(emailContainer, riskyLinks) {
+        if (!emailContainer || emailContainer.dataset.scamspotMarked) return;
+
+        emailContainer.dataset.scamspotMarked = 'true';
+
+        // Add red border and background to email
+        emailContainer.style.borderLeft = '6px solid #ff0000';
+        emailContainer.style.backgroundColor = '#fff0f0';
+        emailContainer.style.boxShadow = '0 0 10px rgba(255, 0, 0, 0.3)';
+
+        // Create warning badge
+        const warningBadge = document.createElement('div');
+        warningBadge.className = 'scamspot-email-warning';
+        warningBadge.style.cssText = `
+            position: absolute;
+            top: 5px;
+            right: 5px;
+            background: linear-gradient(135deg, #ff4444, #cc0000);
+            color: white;
+            padding: 8px 12px;
+            border-radius: 5px;
+            font-weight: bold;
+            font-size: 13px;
+            z-index: 1000;
+            box-shadow: 0 2px 8px rgba(255, 0, 0, 0.4);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        `;
+
+        const totalScore = Math.max(...riskyLinks.map(l => l.score));
+        warningBadge.innerHTML = `
+            <span style="font-size: 18px;">🚨</span>
+            <span>SCAM ALERT ${totalScore}%</span>
+        `;
+
+        // Show details on hover
+        const allReasons = riskyLinks.flatMap(l => l.reasons).join('\n• ');
+        warningBadge.title = `⚠️ SUSPICIOUS EMAIL DETECTED\n\nThreats found: ${riskyLinks.length}\n\nReasons:\n• ${allReasons}`;
+
+        // Click to show details
+        warningBadge.addEventListener('click', (e) => {
+            e.stopPropagation();
+            alert(
+                `🚨 SCAM ALERT - This email is suspicious!\n\n` +
+                `Risk Level: ${totalScore}%\n` +
+                `Suspicious links found: ${riskyLinks.length}\n\n` +
+                `Reasons:\n• ${allReasons}\n\n` +
+                `⚠️ DO NOT click links or provide personal information!`
+            );
+        });
+
+        // Position badge relative to email container
+        if (emailContainer.style.position !== 'relative' && emailContainer.style.position !== 'absolute') {
+            emailContainer.style.position = 'relative';
+        }
+
+        emailContainer.insertBefore(warningBadge, emailContainer.firstChild);
+    }
+
+    // Highlight risky links on the page AND mark their parent emails
     function highlightMaliciousLinks(riskyLinks) {
         const allLinks = document.querySelectorAll("a");
         let highlightCount = 0;
+        const markedEmails = new Map(); // Track which emails have which risky links
 
         riskyLinks.forEach(({ url, reasons, score }) => {
             allLinks.forEach(link => {
@@ -227,27 +354,47 @@ if (!window.__SCAMSTOP_CONTENT_LOADED__) {
 
                     // Add click warning
                     link.addEventListener('click', function(e) {
+                        e.preventDefault();
+                        e.stopPropagation();
                         const confirmClick = confirm(
-                            `⚠️ WARNING: This link may be dangerous!\n\n` +
-                            `Risk Level: ${score}%\n` +
+                            `🚨 DANGER: This link is HIGHLY SUSPICIOUS!\n\n` +
+                            `Risk Level: ${score}%\n\n` +
                             `Reasons:\n${reasonText}\n\n` +
-                            `Are you sure you want to continue?`
+                            `This link may steal your personal information, passwords, or credit card details.\n\n` +
+                            `Are you ABSOLUTELY SURE you want to continue?`
                         );
-                        if (!confirmClick) {
-                            e.preventDefault();
+                        if (confirmClick) {
+                            window.open(url, '_blank');
                         }
-                    }, { once: true });
+                    }, { once: false });
+
+                    // Find and mark the parent email container
+                    const emailContainer = findEmailContainer(link);
+                    if (emailContainer) {
+                        if (!markedEmails.has(emailContainer)) {
+                            markedEmails.set(emailContainer, []);
+                        }
+                        markedEmails.get(emailContainer).push({ url, reasons, score });
+                    }
 
                     highlightCount++;
                 }
             });
         });
 
+        // Mark all affected email containers
+        markedEmails.forEach((riskyLinksInEmail, emailContainer) => {
+            markSuspiciousEmail(emailContainer, riskyLinksInEmail);
+        });
+
         if (highlightCount > 0) {
-            console.log(`🚨 Highlighted ${highlightCount} dangerous links`);
+            console.log(`🚨 Highlighted ${highlightCount} dangerous links in ${markedEmails.size} emails`);
 
             // Show notification
-            showNotification(`⚠️ ScamSpot: Found ${highlightCount} suspicious link${highlightCount > 1 ? 's' : ''} on this page!`);
+            showNotification(
+                `🚨 SCAM ALERT: Found ${highlightCount} suspicious link${highlightCount > 1 ? 's' : ''} ` +
+                `in ${markedEmails.size} email${markedEmails.size > 1 ? 's' : ''}!`
+            );
         }
     }
 
@@ -294,25 +441,154 @@ if (!window.__SCAMSTOP_CONTENT_LOADED__) {
         setTimeout(() => notification.remove(), 10000);
     }
 
-    // Detect phishing content on the page
-    function detectPhishingContent() {
-        const phishingKeywords = [
-            'verify your account', 'account suspended', 'urgent action required',
-            'confirm your identity', 'unusual activity', 'click here immediately',
-            'your account will be closed', 'update payment information',
-            'prize winner', 'claim your reward', 'act now', 'limited time',
-            'suspended account', 'verify identity', 'security alert'
+    // Analyze email content for scam indicators
+    function analyzeEmailContent(element) {
+        const text = element.innerText || element.textContent || '';
+        const textLower = text.toLowerCase();
+        let score = 0;
+        let indicators = [];
+
+        // Category 1: Urgency tactics
+        const urgencyPhrases = [
+            'urgent action required', 'immediate action', 'act now', 'limited time',
+            'expires today', 'expires soon', 'within 24 hours', 'within 48 hours',
+            'last chance', 'final notice', 'do not delay', 'respond immediately'
         ];
-
-        const text = document.body.innerText.toLowerCase();
-        const matches = phishingKeywords.filter(keyword => text.includes(keyword.toLowerCase()));
-
-        if (matches.length > 0) {
-            console.warn(`⚠️ Detected ${matches.length} phishing keywords:`, matches);
-            showNotification(`⚠️ Warning: This page contains ${matches.length} suspicious phrase${matches.length > 1 ? 's' : ''} commonly used in scams!`);
+        const urgencyMatches = urgencyPhrases.filter(p => textLower.includes(p));
+        if (urgencyMatches.length > 0) {
+            score += urgencyMatches.length * 15;
+            indicators.push(`Urgency tactics: ${urgencyMatches.join(', ')}`);
         }
 
-        return { matches, count: matches.length };
+        // Category 2: Account threats
+        const threatPhrases = [
+            'account suspended', 'account locked', 'account will be closed',
+            'account has been compromised', 'unauthorized access', 'suspicious activity',
+            'unusual activity', 'verify your account', 'confirm your identity',
+            'restore access', 'reactivate your account'
+        ];
+        const threatMatches = threatPhrases.filter(p => textLower.includes(p));
+        if (threatMatches.length > 0) {
+            score += threatMatches.length * 20;
+            indicators.push(`Account threats: ${threatMatches.join(', ')}`);
+        }
+
+        // Category 3: Prize/Money scams
+        const prizePhrases = [
+            'you\'ve won', 'prize winner', 'claim your reward', 'claim your prize',
+            'congratulations', 'you\'re a winner', 'free money', 'cash reward',
+            'inheritance', 'lottery', 'sweepstakes', 'grant awarded'
+        ];
+        const prizeMatches = prizePhrases.filter(p => textLower.includes(p));
+        if (prizeMatches.length > 0) {
+            score += prizeMatches.length * 25;
+            indicators.push(`Prize scam indicators: ${prizeMatches.join(', ')}`);
+        }
+
+        // Category 4: Payment requests
+        const paymentPhrases = [
+            'update payment', 'payment failed', 'billing problem', 'payment method',
+            'credit card expired', 'verify payment', 'update billing', 'confirm payment',
+            'refund pending', 'tax refund', 'wire transfer', 'send money'
+        ];
+        const paymentMatches = paymentPhrases.filter(p => textLower.includes(p));
+        if (paymentMatches.length > 0) {
+            score += paymentMatches.length * 18;
+            indicators.push(`Payment requests: ${paymentMatches.join(', ')}`);
+        }
+
+        // Category 5: Credential requests
+        const credentialPhrases = [
+            'verify password', 'confirm password', 'reset password', 'update password',
+            'enter your password', 'provide your ssn', 'social security', 'tax id',
+            'enter credentials', 'verify credentials', 'confirm login'
+        ];
+        const credentialMatches = credentialPhrases.filter(p => textLower.includes(p));
+        if (credentialMatches.length > 0) {
+            score += credentialMatches.length * 30;
+            indicators.push(`Credential requests: ${credentialMatches.join(', ')}`);
+        }
+
+        // Category 6: Grammar/spelling issues (common in scams)
+        const grammarIssues = [];
+        if (/dear (customer|user|member|sir\/madam)/i.test(text)) {
+            grammarIssues.push('Generic greeting');
+            score += 10;
+        }
+        if (text.match(/[A-Z]{10,}/)) { // Excessive caps
+            grammarIssues.push('Excessive capitalization');
+            score += 15;
+        }
+        if (grammarIssues.length > 0) {
+            indicators.push(`Grammar issues: ${grammarIssues.join(', ')}`);
+        }
+
+        // Category 7: Suspicious sender patterns (check from/reply-to)
+        const emailPattern = /[\w.-]+@[\w.-]+\.\w+/g;
+        const emails = text.match(emailPattern) || [];
+        const suspiciousEmailPatterns = [
+            /@.*\.xyz$/, /@.*\.top$/, /@.*\.click$/,
+            /noreply@(?!.*\.(com|org|net))/, // noreply from unusual TLD
+            /support@.*\.info$/, /admin@.*\.tk$/
+        ];
+        const suspiciousEmails = emails.filter(email =>
+            suspiciousEmailPatterns.some(pattern => pattern.test(email.toLowerCase()))
+        );
+        if (suspiciousEmails.length > 0) {
+            score += 25;
+            indicators.push(`Suspicious sender: ${suspiciousEmails[0]}`);
+        }
+
+        return {
+            score,
+            indicators,
+            isSuspicious: score >= 30
+        };
+    }
+
+    // Detect phishing content on the page
+    function detectPhishingContent() {
+        const analysis = analyzeEmailContent(document.body);
+
+        if (analysis.isSuspicious) {
+            console.warn(`⚠️ Detected ${analysis.indicators.length} scam indicators (score: ${analysis.score}):`, analysis.indicators);
+
+            // Highlight emails with suspicious content
+            const emailContainers = document.querySelectorAll('tr.zA, div[role="listitem"], div.gs, div.ii');
+            emailContainers.forEach(container => {
+                const containerAnalysis = analyzeEmailContent(container);
+                if (containerAnalysis.isSuspicious && !container.dataset.scamspotContentMarked) {
+                    container.dataset.scamspotContentMarked = 'true';
+
+                    // Add warning overlay for suspicious content
+                    const contentWarning = document.createElement('div');
+                    contentWarning.className = 'scamspot-content-warning';
+                    contentWarning.style.cssText = `
+                        background: rgba(255, 165, 0, 0.15);
+                        border-top: 3px solid orange;
+                        padding: 10px;
+                        margin: 5px 0;
+                        border-radius: 5px;
+                        font-size: 12px;
+                        color: #cc6600;
+                        font-weight: bold;
+                    `;
+                    contentWarning.innerHTML = `
+                        ⚠️ SUSPICIOUS CONTENT DETECTED (${containerAnalysis.score}% risk)<br>
+                        <small>${containerAnalysis.indicators.slice(0, 3).join(' • ')}</small>
+                    `;
+
+                    container.insertBefore(contentWarning, container.firstChild);
+                }
+            });
+
+            showNotification(
+                `⚠️ SCAM WARNING: Detected ${analysis.indicators.length} suspicious phrase${analysis.indicators.length > 1 ? 's' : ''} ` +
+                `commonly used in phishing emails!`
+            );
+        }
+
+        return analysis;
     }
 
     // Create a MutationObserver to detect DOM changes
