@@ -5,11 +5,13 @@
 ### Step 1: Setup Backend (2 minutes)
 
 ```bash
-# Unzip backend
-unzip project_backend.zip -d backend
-
-# Install and configure
+# Navigate to backend (already included, no unzipping needed!)
 cd backend
+
+# Run setup script (creates .env and installs dependencies)
+./setup.sh
+
+# OR manually:
 npm install
 
 # Add your API keys to .env (create this file)
