@@ -27,8 +27,10 @@ ScamSpot is a Chrome extension that automatically detects and flags potential sc
 This repository contains:
 - **`extension-dist/`** - Ready-to-use Chrome extension (load this in Chrome)
 - **`chrome-extension/`** - Extension source code (React + TypeScript)
-- **`project_backend.zip`** - Optional backend service for advanced features
+- **`backend/`** - Optional backend service for advanced features (ready to use!)
 - **Documentation** - QUICKSTART-STANDALONE.md, QUICKSTART.md, EXTENSION_SETUP.md
+
+**Note:** The backend is now included directly - no need to unzip anything!
 
 ## 🎯 Features
 
