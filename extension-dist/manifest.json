@@ -1,0 +1,63 @@
+{
+  "manifest_version": 3,
+  "name": "ScamSpot - Phishing & Scam Detector",
+  "version": "1.0.0",
+  "description": "Detects and flags potential scams in emails, inbox communications, and open chats in your browser",
+  "icons": {
+    "16": "favicon.ico",
+    "48": "logo192.png",
+    "128": "logo512.png"
+  },
+  "permissions": [
+    "storage",
+    "tabs",
+    "scripting",
+    "activeTab",
+    "alarms"
+  ],
+  "host_permissions": [
+    "https://mail.google.com/*",
+    "https://web.whatsapp.com/*",
+    "https://web.telegram.org/*",
+    "https://www.instagram.com/*",
+    "https://web.snapchat.com/*",
+    "https://messenger.com/*",
+    "http://localhost:3000/*",
+    "http://localhost:3002/*"
+  ],
+  "background": {
+    "service_worker": "background.js"
+  },
+  "content_scripts": [
+    {
+      "matches": [
+        "https://mail.google.com/*",
+        "https://web.whatsapp.com/*",
+        "https://web.telegram.org/*",
+        "https://www.instagram.com/*",
+        "https://web.snapchat.com/*",
+        "https://messenger.com/*"
+      ],
+      "js": ["contentScript.js"],
+      "run_at": "document_end"
+    }
+  ],
+  "action": {
+    "default_popup": "index.html",
+    "default_icon": {
+      "16": "favicon.ico",
+      "48": "logo192.png",
+      "128": "logo512.png"
+    },
+    "default_title": "ScamSpot - Monitor for Scams"
+  },
+  "web_accessible_resources": [
+    {
+      "resources": ["contentScript.js", "logo_scam_stop.png"],
+      "matches": ["<all_urls>"]
+    }
+  ],
+  "content_security_policy": {
+    "extension_pages": "script-src 'self'; object-src 'self'"
+  }
+}
