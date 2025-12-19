@@ -1,44 +1,87 @@
 # ScamSpot - Phishing & Scam Detector Chrome Extension
 
-> **Protect yourself from scams in emails and online chats with AI-powered real-time detection**
+> **Protect yourself from scams in emails and online chats - Works out-of-the-box, no setup required!**
 
-ScamSpot is a Chrome extension that automatically detects and flags potential scams, phishing attempts, and malicious links in your emails (Gmail) and chat platforms (WhatsApp, Telegram, Instagram, Messenger, Snapchat). It uses multi-layered AI analysis to identify suspicious content and highlights dangerous links in real-time.
+ScamSpot is a Chrome extension that automatically detects and flags potential scams, phishing attempts, and malicious links in your emails (Gmail) and chat platforms (WhatsApp, Telegram, Instagram, Messenger, Snapchat). **Works standalone with client-side analysis - no API keys or backend server needed!**
 
 ## 🚀 Quick Start
 
-**New users?** See [QUICKSTART.md](QUICKSTART.md) for a 5-minute setup guide.
+**Just want it to work?** See [QUICKSTART-STANDALONE.md](QUICKSTART-STANDALONE.md) for 1-minute installation (NO setup required!)
 
-**Detailed setup?** See [EXTENSION_SETUP.md](EXTENSION_SETUP.md) for comprehensive installation and usage instructions.
+**Want advanced AI features?** See [QUICKSTART.md](QUICKSTART.md) for full setup with backend.
 
-## ✨ What's New - Extension is Now Working!
+**Detailed documentation?** See [EXTENSION_SETUP.md](EXTENSION_SETUP.md) for comprehensive instructions.
 
-✅ **Fixed empty manifest.json** - Extension now loads properly
-✅ **Built and ready to use** - Load from `./extension-dist` folder
-✅ **Standardized API endpoints** - All services use port 3000
-✅ **Complete documentation** - Setup guides and troubleshooting included
+## ✨ What's New - Now Works Without Any Setup!
+
+✅ **Standalone mode** - Works out-of-the-box, no backend or API keys needed!
+✅ **Client-side URL analysis** - 10+ security checks per link
+✅ **Phishing keyword detection** - Identifies common scam phrases
+✅ **Visual warnings** - Highlights risky links in red
+✅ **Click protection** - Warns before opening dangerous links
+✅ **Optional backend** - Connect for AI-powered advanced features
+✅ **Auto-detection** - Seamlessly switches between standalone and advanced mode
 
 ## 📦 Project Structure
 
 This repository contains:
 - **`extension-dist/`** - Ready-to-use Chrome extension (load this in Chrome)
 - **`chrome-extension/`** - Extension source code (React + TypeScript)
-- **`project_backend.zip`** - Backend service (needs to be unzipped)
-- **Documentation** - QUICKSTART.md, EXTENSION_SETUP.md
+- **`project_backend.zip`** - Optional backend service for advanced features
+- **Documentation** - QUICKSTART-STANDALONE.md, QUICKSTART.md, EXTENSION_SETUP.md
 
 ## 🎯 Features
 
-### Chrome Extension
-- 🛡️ **Real-time Link Validation** - Scans all links on monitored pages
-- 🚨 **Visual Warnings** - Highlights risky links in red with warning indicators
-- 📸 **Screenshot Capture** - Documents suspicious content automatically
-- 🔍 **Phishing Detection** - Identifies common scam patterns and keywords
-- 💾 **Privacy-Focused** - All data stored locally on your machine
+### Standalone Mode (No Setup Required!)
+- 🛡️ **Real-time URL Analysis** - 10+ heuristic checks for suspicious links
+- 🚨 **Visual Warnings** - Highlights risky links in red with tooltips
+- ⚠️ **Click Protection** - Confirms before opening dangerous links
+- 🔍 **Phishing Detection** - Identifies scam keywords and patterns
+- 🎭 **Brand Impersonation** - Detects fake login pages
+- 🌐 **Works Offline** - No internet connection needed
+- 💾 **Privacy-Focused** - All analysis in your browser
 
-### Backend Service
+### Advanced Mode (Optional Backend)
+- 🤖 **AI-Powered Analysis** - OpenAI GPT-4 scam detection
+- 💭 **Sentiment Analysis** - Azure Text Analytics integration
+- 🌍 **Google Safe Browsing** - Real-time threat database
+- 📸 **Image Analysis** - Extract and analyze text from images
+- 📊 **Historical Tracking** - MongoDB threat database
+- 👤 **User Authentication** - Google OAuth integration
 
-A robust backend service for detecting and analyzing potential scams across different communication channels. The service implements multiple layers of analysis including URL risk assessment, sentiment analysis, image processing, and scam message detection.
+## 📥 Installation
 
-## Features
+### Option 1: Standalone (No Setup - Recommended!)
+
+1. Open Chrome → `chrome://extensions/`
+2. Enable "Developer Mode" (top-right toggle)
+3. Click "Load unpacked" → Select `extension-dist/` folder
+4. **Done!** Click the ScamSpot icon and start monitoring
+
+**That's it! No API keys, no backend, no configuration needed.**
+
+### Option 2: With Advanced Features
+
+Follow [QUICKSTART.md](QUICKSTART.md) to set up the backend for AI-powered analysis.
+
+## 🎯 How It Works
+
+### Standalone Mode Detection
+
+ScamSpot analyzes URLs using 10+ security checks:
+
+1. **Suspicious TLDs** - Flags .xyz, .top, .click, etc.
+2. **IP Addresses** - Warns about direct IP links
+3. **Excessive Subdomains** - Detects obfuscation attempts
+4. **Phishing Keywords** - Identifies "verify", "urgent", "suspended", etc.
+5. **Brand Impersonation** - Catches fake brand domains
+6. **URL Shorteners** - Warns about hidden destinations
+7. **Homograph Attacks** - Detects lookalike characters
+8. **Excessive Hyphens** - Common in spam domains
+9. **Long URLs** - Often hide malicious content
+10. **Insecure HTTP** - Flags HTTP on login pages
+
+### Advanced Features (Optional Backend)
 
 - **URL Risk Analysis**
   - Multi-layered URL validation
