@@ -24,7 +24,7 @@ export default function About() {
           viewport={{ once: true }}
           className="text-center mb-16"
         >
-          <h2 className="font-handwriting text-5xl sm:text-6xl text-pencil inline-block relative">
+          <h2 className="font-handwriting text-5xl sm:text-6xl text-pencil inline-block relative click-wiggle">
             About Me
             <motion.svg
               className="absolute -bottom-2 left-0 w-full"
@@ -70,7 +70,7 @@ export default function About() {
 
               <div className="flex items-center gap-3 mb-4">
                 <GraduationCapIcon size={32} className="text-accent-coral" />
-                <h3 className="font-marker text-2xl text-pencil">Education</h3>
+                <h3 className="font-marker text-2xl text-pencil click-wiggle">Education</h3>
               </div>
 
               <div className="space-y-3 font-sketch text-lg">
@@ -112,7 +112,7 @@ export default function About() {
 
               <div className="flex items-center gap-3 mb-4">
                 <TrophyIcon size={32} className="text-accent-teal" />
-                <h3 className="font-marker text-2xl text-pencil">Honors</h3>
+                <h3 className="font-marker text-2xl text-pencil click-wiggle">Honors</h3>
               </div>
 
               <div className="space-y-4">
@@ -121,7 +121,7 @@ export default function About() {
                   className="bg-white p-4 rounded-lg shadow-sm"
                   style={{ border: "1px dashed #ccc" }}
                 >
-                  <p className="font-sketch text-lg text-pencil flex items-center gap-2">
+                  <p className="font-sketch text-lg text-pencil flex items-center gap-2 click-wiggle">
                     <TrophyIcon size={20} className="text-yellow-500" />
                     Stamps Excellence Scholarship
                   </p>
@@ -132,7 +132,7 @@ export default function About() {
                   className="bg-white p-4 rounded-lg shadow-sm"
                   style={{ border: "1px dashed #ccc" }}
                 >
-                  <p className="font-sketch text-lg text-pencil flex items-center gap-2">
+                  <p className="font-sketch text-lg text-pencil flex items-center gap-2 click-wiggle">
                     <StarDoodle size={20} color="#ffd54f" filled />
                     President&apos;s Honor Roll
                   </p>
@@ -184,7 +184,7 @@ export default function About() {
                   borderRadius: "2px",
                 }}
               >
-                <p className="font-sketch text-pencil whitespace-nowrap">
+                <p className="font-sketch text-pencil whitespace-nowrap click-wiggle">
                   {course}
                 </p>
               </motion.div>

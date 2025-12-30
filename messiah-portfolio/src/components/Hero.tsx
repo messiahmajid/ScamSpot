@@ -52,7 +52,7 @@ export default function Hero() {
           transition={{ duration: 0.6 }}
           className="mb-6"
         >
-          <span className="inline-block font-sketch text-xl sm:text-2xl text-pencil-light bg-highlight-yellow px-4 py-1 rounded transform -rotate-1">
+          <span className="inline-block font-sketch text-xl sm:text-2xl text-pencil-light bg-highlight-yellow px-4 py-1 rounded transform -rotate-1 click-wiggle hover-wiggle">
             Hey there! I&apos;m
           </span>
         </motion.div>
@@ -62,7 +62,7 @@ export default function Hero() {
           initial={{ opacity: 0, y: 30 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6, delay: 0.2 }}
-          className="font-handwriting text-6xl sm:text-7xl md:text-8xl lg:text-9xl text-pencil mb-6 leading-tight"
+          className="font-handwriting text-6xl sm:text-7xl md:text-8xl lg:text-9xl text-pencil mb-6 leading-tight click-wiggle"
         >
           <ScribbleUnderline color="#ff6b6b">
             Messiah Majid
@@ -76,15 +76,15 @@ export default function Hero() {
           transition={{ duration: 0.6, delay: 0.4 }}
           className="flex flex-col sm:flex-row items-center justify-center gap-2 sm:gap-4 mb-8"
         >
-          <span className="font-sketch text-2xl sm:text-3xl text-pencil-light">
+          <span className="font-sketch text-2xl sm:text-3xl text-pencil-light click-wiggle hover-wiggle">
             Computer Science
           </span>
-          <span className="hidden sm:inline font-handwriting text-3xl text-accent-coral">+</span>
-          <span className="font-sketch text-2xl sm:text-3xl text-pencil-light">
+          <span className="hidden sm:inline font-handwriting text-3xl text-accent-coral click-wiggle">+</span>
+          <span className="font-sketch text-2xl sm:text-3xl text-pencil-light click-wiggle hover-wiggle">
             Math
           </span>
-          <span className="hidden sm:inline font-handwriting text-3xl text-accent-teal">+</span>
-          <span className="font-sketch text-2xl sm:text-3xl text-pencil-light">
+          <span className="hidden sm:inline font-handwriting text-3xl text-accent-teal click-wiggle">+</span>
+          <span className="font-sketch text-2xl sm:text-3xl text-pencil-light click-wiggle hover-wiggle">
             Biology
           </span>
         </motion.div>
@@ -105,10 +105,10 @@ export default function Hero() {
           >
             <p className="font-sketch text-lg sm:text-xl text-pencil leading-relaxed">
               Building impactful software at the intersection of{" "}
-              <span className="highlight-text">technology</span> and{" "}
-              <span className="highlight-pink">life sciences</span>.
+              <span className="highlight-text click-wiggle">technology</span> and{" "}
+              <span className="highlight-pink click-wiggle">life sciences</span>.
               Currently studying at the{" "}
-              <span className="highlight-blue">University of Miami</span>
+              <span className="highlight-blue click-wiggle">University of Miami</span>
             </p>
           </div>
           {/* Tape decoration */}

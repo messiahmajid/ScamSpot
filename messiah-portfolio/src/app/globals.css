@@ -325,6 +325,38 @@ body {
   transition: transform 0.1s ease;
 }
 
+/* Click wiggle animation for text */
+.click-wiggle {
+  cursor: pointer;
+  display: inline-block;
+  transition: transform 0.1s ease;
+}
+
+.click-wiggle:active {
+  animation: textWiggle 0.4s ease-in-out;
+}
+
+@keyframes textWiggle {
+  0% { transform: rotate(0deg); }
+  15% { transform: rotate(-3deg) scale(1.02); }
+  30% { transform: rotate(3deg) scale(0.98); }
+  45% { transform: rotate(-2deg) scale(1.01); }
+  60% { transform: rotate(2deg) scale(0.99); }
+  75% { transform: rotate(-1deg); }
+  100% { transform: rotate(0deg); }
+}
+
+/* Wiggle on hover for interactive elements */
+.hover-wiggle:hover {
+  animation: subtleWiggle 0.5s ease-in-out;
+}
+
+@keyframes subtleWiggle {
+  0%, 100% { transform: rotate(0deg); }
+  25% { transform: rotate(-2deg); }
+  75% { transform: rotate(2deg); }
+}
+
 /* Paper fold corner */
 .paper-fold {
   position: relative;
