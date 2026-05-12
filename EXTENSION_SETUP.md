@@ -16,10 +16,8 @@ Before installing the extension, you need to set up the backend service:
    - Azure Cognitive Services (Text Analytics)
    - Google Safe Browsing API
 
-4. **Extract and setup the backend**:
+4. **Set up the included backend**:
    ```bash
-   # Unzip the backend service
-   unzip project_backend.zip -d backend
    cd backend
 
    # Install dependencies
@@ -28,9 +26,9 @@ Before installing the extension, you need to set up the backend service:
    # Create .env file with your API keys
    cat > .env << EOF
    OPENAI=your_openai_api_key
-   MONGODB_URI=your_mongodb_connection_string
-   AZURE_TEXT_ANALYTICS_KEY=your_azure_key
-   AZURE_TEXT_ANALYTICS_ENDPOINT=your_azure_endpoint
+   MONGO=your_mongodb_connection_string
+   AZUREKEY=your_azure_key
+   AZUREURL=your_azure_endpoint
    GOOGLE_SAFE_BROWSING_API_KEY=your_google_api_key
    PORT=3000
    EOF

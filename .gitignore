@@ -11,9 +11,13 @@
 
 # production
 /build
+/chrome-extension/build
+/chrome-extension/extension-dist
 
 # misc
+.idea/
 .DS_Store
+*.zip
 .env.local
 .env.development.local
 .env.test.local

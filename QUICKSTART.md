@@ -16,9 +16,9 @@ npm install
 
 # Add your API keys to .env (create this file)
 echo "OPENAI=your_key_here
-MONGODB_URI=mongodb://localhost:27017/scamspot
-AZURE_TEXT_ANALYTICS_KEY=your_key_here
-AZURE_TEXT_ANALYTICS_ENDPOINT=your_endpoint_here
+MONGO=mongodb://localhost:27017/scamspot
+AZUREKEY=your_key_here
+AZUREURL=your_endpoint_here
 GOOGLE_SAFE_BROWSING_API_KEY=your_key_here
 PORT=3000" > .env
 

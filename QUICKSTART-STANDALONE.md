@@ -69,7 +69,6 @@ Want AI-powered deep analysis? Optionally set up the backend for:
 
 **To enable advanced features:**
 ```bash
-unzip project_backend.zip -d backend
 cd backend
 npm install
 # Create .env with your API keys (see EXTENSION_SETUP.md)

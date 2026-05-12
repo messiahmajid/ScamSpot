@@ -119,9 +119,9 @@ ScamSpot analyzes URLs using 10+ security checks:
 
 ```env
 OPENAI=your_openai_api_key
-MONGODB_URI=your_mongodb_connection_string
-AZURE_TEXT_ANALYTICS_KEY=your_azure_key
-AZURE_TEXT_ANALYTICS_ENDPOINT=your_azure_endpoint
+MONGO=your_mongodb_connection_string
+AZUREKEY=your_azure_key
+AZUREURL=your_azure_endpoint
 GOOGLE_SAFE_BROWSING_API_KEY=your_google_api_key
 ```
 
@@ -141,9 +141,8 @@ See [EXTENSION_SETUP.md](EXTENSION_SETUP.md) for detailed instructions.
 
 ### Backend Service
 
-1. Extract the backend:
+1. Open the included backend:
 ```bash
-unzip project_backend.zip -d backend
 cd backend
 ```
 
@@ -155,9 +154,9 @@ npm install
 3. Set up environment variables (create `.env` file):
 ```bash
 OPENAI=your_openai_api_key
-MONGODB_URI=your_mongodb_connection_string
-AZURE_TEXT_ANALYTICS_KEY=your_azure_key
-AZURE_TEXT_ANALYTICS_ENDPOINT=your_azure_endpoint
+MONGO=your_mongodb_connection_string
+AZUREKEY=your_azure_key
+AZUREURL=your_azure_endpoint
 GOOGLE_SAFE_BROWSING_API_KEY=your_google_api_key
 PORT=3000
 ```
