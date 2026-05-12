@@ -9,6 +9,9 @@ A flexible backend service for scam detection that works standalone or with opti
 - ✅ Basic phishing detection
 - ✅ Message pattern matching
 - ✅ Decision tree classification
+- ✅ Concurrent detector orchestration with per-service timeouts
+- ✅ Retry handling for transient upstream failures
+- ✅ Service status reporting when upstreams fail or are disabled
 
 ### Optional Advanced Features
 - 🤖 OpenAI GPT-4 scam analysis (requires OPENAI key)
@@ -72,9 +75,19 @@ See `.env.example` for all available configuration options.
 - `POST /validate-url` - Validate URLs for scams
   ```json
   {
-    "urls": [{"url": "https://example.com"}]
+    "urls": [{
+      "url": "https://example.com",
+      "platform": "gmail",
+      "text": "visible link text",
+      "context": "surrounding message body"
+    }]
   }
   ```
+
+### Dashboard Data
+- `GET /stats` - Aggregate scan counts, risk distribution, platform distribution, and detector health
+- `GET /scans?limit=25` - Recent persisted scan history
+- `GET /bad-links?limit=50` - High-risk URL cache with frequency and last-seen metadata
 
 ### Image Analysis
 - `POST /analyze` - Analyze images for scam content
@@ -98,10 +111,10 @@ The backend gracefully degrades based on available API keys:
 
 **With OpenAI key:**
 - AI-powered scam message analysis
-- Advanced URL classification
+- Advanced URL classification via a REST chat-completions call
 
 **With Azure keys:**
-- Sentiment analysis for messages
+- Sentiment analysis for messages and message-context scam pressure signals
 
 **With Google Safe Browsing:**
 - Real-time threat database checks
@@ -109,6 +122,21 @@ The backend gracefully degrades based on available API keys:
 **With MongoDB:**
 - Historical threat tracking
 - User data persistence
+- Scan history and dashboard analytics
+
+`POST /validate-url` runs the enabled URL detectors concurrently. Each detector has an independent timeout and retry budget, so a slow or failed upstream returns a service status instead of blocking the response path.
+
+## Testing
+
+```bash
+npm test
+```
+
+The backend test suite includes:
+- 500+ generated adversarial phishing URL scenarios
+- Curated phishing and benign URL fixtures
+- Timeout, retry, and concurrent execution tests
+- Merge behavior proving one failed service does not block other detector results
 
 ## Development
 

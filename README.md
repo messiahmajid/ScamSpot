@@ -179,10 +179,18 @@ npm start
   ```json
   {
     "urls": [
-      {"url": "https://example.com"}
+      {
+        "url": "https://example.com",
+        "platform": "gmail",
+        "text": "visible link text",
+        "context": "surrounding message or email body"
+      }
     ]
   }
   ```
+- `GET /stats` - Dashboard metrics for scans, platforms, risks, and detector health
+- `GET /scans` - Recent MongoDB-backed scan history
+- `GET /bad-links` - Persisted high-risk URL cache with frequency counts
 
 ### Image Analysis
 - `POST /analyze` - Process and analyze images for scam detection
@@ -203,9 +211,11 @@ The service implements a multi-layered analysis approach:
 
 1. **URL Analysis Pipeline**
    - Local heuristic analysis
-   - Google Safe Browsing API check
-   - Machine learning classification
-   - Historical risk database
+   - Google Safe Browsing REST check
+   - OpenAI URL analysis REST check
+   - Azure message-context signal analysis
+   - Per-service timeout and retry handling
+   - MongoDB scan history and high-risk URL cache
 
 2. **Message Analysis Pipeline**
    - Sentiment analysis
@@ -213,13 +223,25 @@ The service implements a multi-layered analysis approach:
    - Context-aware classification
    - Final risk assessment
 
+3. **Dashboard**
+   - React web dashboard for backend health, service status, platform coverage, scan history, and bad-link frequency.
+
+4. **Six-Platform Extension Extraction**
+   - Platform-aware link/context extraction for Gmail, WhatsApp, Telegram, Instagram, Snapchat, and Messenger.
+
 ## Error Handling
 
 The service implements comprehensive error handling with:
 - Input validation
 - API error management
+- Independent detector status reporting
+- Timeout and retry handling
 - File processing safeguards
 - Database operation error handling
+
+## Testing
+
+The backend includes a CI-friendly `npm test` suite covering 500+ generated adversarial phishing URLs, curated phishing/benign fixtures, concurrency, retries, timeout behavior, and failure-tolerant result merging.
 
 ## Database Schema
 
@@ -242,4 +264,3 @@ The service uses MongoDB with the following main collections:
 3. Commit your changes
 4. Push to the branch
 5. Create a new Pull Request
-

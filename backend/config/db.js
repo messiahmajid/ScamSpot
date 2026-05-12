@@ -2,14 +2,16 @@ const mongoose = require('mongoose');
 
 const connectDB = async () => {
     // Make MongoDB optional
-    if (!process.env.MONGO) {
+    const mongoUri = process.env.MONGO || process.env.MONGODB_URI;
+
+    if (!mongoUri) {
         console.log('⚠️  MongoDB not configured - running in stateless mode');
         console.log('   (Historical tracking and user data persistence disabled)');
         return false;
     }
 
     try {
-        await mongoose.connect(process.env.MONGO, {
+        await mongoose.connect(mongoUri, {
             useNewUrlParser: true,
             useUnifiedTopology: true,
         });

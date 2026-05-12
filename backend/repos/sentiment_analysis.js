@@ -1,62 +1,82 @@
-const { TextAnalyticsClient, AzureKeyCredential } = require("@azure/ai-text-analytics");
-
 class SentimentAnalyzer {
-    constructor() {
-        this.client = new TextAnalyticsClient(
-            process.env.AZUREURL,
-            new AzureKeyCredential(process.env.AZUREKEY)
-        );
+    constructor(options = {}) {
+        this.endpoint = (options.endpoint || process.env.AZUREURL || "").replace(/\/$/, "");
+        this.key = options.key || process.env.AZUREKEY;
+        this.timeoutMs = options.timeoutMs || Number(process.env.DETECTION_SERVICE_TIMEOUT_MS || 3500);
     }
 
-    // Convert message array to conversation string
     _formatConversation(messages) {
-        return messages.map(msg =>
-            `${msg.sender}: ${msg.content}`
-        ).join('\n');
+        return messages.map(msg => `${msg.sender}: ${msg.content}`).join('\n');
+    }
+
+    _neutral(messages, message) {
+        return messages.map(msg => ({
+            ...msg,
+            error: message,
+            sentiment: "neutral",
+            confidenceScores: {
+                positive: 0,
+                neutral: 1,
+                negative: 0
+            }
+        }));
     }
 
     async analyzeConversation(messages) {
+        if (!Array.isArray(messages) || messages.length === 0) {
+            return [];
+        }
+
+        if (!this.endpoint || !this.key) {
+            return this._neutral(messages, "Azure Text Analytics is not configured");
+        }
+
+        const controller = new AbortController();
+        const timer = setTimeout(() => controller.abort(), this.timeoutMs);
+
         try {
-            // 1. Convert messages to conversation format
             const conversationText = this._formatConversation(messages);
-
-            // 2. Prepare documents for analysis
-            const documents = [{
-                id: "1",
-                text: conversationText,
-                language: "en"
-            }];
-
-            // 3. Perform sentiment analysis
-            const results = await this.client.analyzeSentiment(documents, {
-                includeOpinionMining: true
+            const response = await fetch(`${this.endpoint}/text/analytics/v3.1/sentiment`, {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    "Ocp-Apim-Subscription-Key": this.key
+                },
+                signal: controller.signal,
+                body: JSON.stringify({
+                    documents: [{
+                        id: "1",
+                        text: conversationText.slice(0, 5000),
+                        language: "en"
+                    }]
+                })
             });
 
-            // 4. Process results
-            if (results.length === 0 || results[0].error) {
-                throw new Error(results[0]?.error?.message || "Sentiment analysis failed");
+            if (!response.ok) {
+                throw new Error(`Azure Text Analytics returned ${response.status}`);
             }
 
-            const documentResult = results[0];
+            const payload = await response.json();
+            const documentResult = payload.documents?.[0];
+            if (!documentResult) {
+                throw new Error("Azure Text Analytics returned no document result");
+            }
 
-            // 5. Map results back to original messages
             return messages.map((message, index) => ({
                 ...message,
-                sentiment: documentResult.sentences[index]?.sentiment || "neutral",
-                confidenceScores: documentResult.sentences[index]?.confidenceScores || {
-                    positive: 0,
-                    neutral: 0,
-                    negative: 0
-                }
+                sentiment: documentResult.sentences?.[index]?.sentiment || documentResult.sentiment || "neutral",
+                confidenceScores: documentResult.sentences?.[index]?.confidenceScores ||
+                    documentResult.confidenceScores || {
+                        positive: 0,
+                        neutral: 0,
+                        negative: 0
+                    }
             }));
-
         } catch (error) {
             console.error("Sentiment analysis error:", error);
-            return messages.map(msg => ({
-                ...msg,
-                error: error.message,
-                sentiment: "neutral"
-            }));
+            return this._neutral(messages, error.message);
+        } finally {
+            clearTimeout(timer);
         }
     }
 }

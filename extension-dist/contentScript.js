@@ -8,6 +8,92 @@ if (!window.__SCAMSTOP_CONTENT_LOADED__) {
     const BACKEND_URL = "http://localhost:3000";
     let backendAvailable = false;
 
+    function detectPlatform() {
+        const hostname = window.location.hostname;
+        if (hostname.includes("mail.google.com")) return "gmail";
+        if (hostname.includes("web.whatsapp.com")) return "whatsapp";
+        if (hostname.includes("web.telegram.org")) return "telegram";
+        if (hostname.includes("instagram.com")) return "instagram";
+        if (hostname.includes("web.snapchat.com")) return "snapchat";
+        if (hostname.includes("messenger.com")) return "messenger";
+        return "unknown";
+    }
+
+    const PLATFORM_CONTEXT_SELECTORS = {
+        gmail: [
+            "div[data-message-id]",
+            "div.gs",
+            "div.ii",
+            "tr.zA",
+            "div[role='listitem']"
+        ],
+        whatsapp: [
+            "div[data-id]",
+            "div.message-in",
+            "div.message-out",
+            "div[role='row']"
+        ],
+        telegram: [
+            ".message",
+            "[data-message-id]",
+            "div[role='listitem']",
+            ".bubble"
+        ],
+        instagram: [
+            "div[role='row']",
+            "div[role='listitem']",
+            "article",
+            "section div"
+        ],
+        snapchat: [
+            "[data-testid*='chat']",
+            "[data-testid*='message']",
+            "div[role='listitem']",
+            "article"
+        ],
+        messenger: [
+            "div[role='row']",
+            "div[role='gridcell']",
+            "div[data-testid*='message']",
+            "div[aria-label*='Message']"
+        ],
+        unknown: [
+            "article",
+            "tr",
+            "div[role='listitem']",
+            "div[data-message-id]"
+        ]
+    };
+
+    function findPlatformContext(link, platform) {
+        const selectors = PLATFORM_CONTEXT_SELECTORS[platform] || PLATFORM_CONTEXT_SELECTORS.unknown;
+        for (const selector of selectors) {
+            const container = link.closest(selector);
+            if (container?.innerText) {
+                return container.innerText.trim().slice(0, 1200);
+            }
+        }
+        return (link.parentElement?.innerText || document.body.innerText || "").trim().slice(0, 1200);
+    }
+
+    function extractPlatformLinks() {
+        const platform = detectPlatform();
+        const seen = new Set();
+
+        return Array.from(document.querySelectorAll("a"))
+            .map(link => ({
+                url: link.href,
+                text: (link.innerText || link.getAttribute("aria-label") || link.title || "").trim().slice(0, 500),
+                context: findPlatformContext(link, platform),
+                platform
+            }))
+            .filter(link => {
+                if (!link.url.startsWith("http") || seen.has(link.url)) return false;
+                seen.add(link.url);
+                return true;
+            });
+    }
+
     // Check if backend is available
     async function checkBackendAvailability() {
         try {
@@ -124,10 +210,7 @@ if (!window.__SCAMSTOP_CONTENT_LOADED__) {
     async function validateLinks() {
         console.log("🔍 Running validateLinks()...");
 
-        // Extract all links
-        const links = Array.from(document.querySelectorAll("a"))
-            .map(a => a.href)
-            .filter(url => url.startsWith("http"));
+        const links = extractPlatformLinks();
 
         if (links.length === 0) {
             console.warn("⚠️ No links found on this page.");
@@ -146,14 +229,12 @@ if (!window.__SCAMSTOP_CONTENT_LOADED__) {
 
     // Backend validation (advanced AI analysis)
     async function validateLinksWithBackend(links) {
-        const urlData = links.map(url => ({ url }));
-
         try {
             const response = await fetch(`${BACKEND_URL}/validate-url`, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 credentials: "include",
-                body: JSON.stringify({ urls: urlData }),
+                body: JSON.stringify({ urls: links }),
             });
 
             const data = await response.json();
@@ -162,8 +243,8 @@ if (!window.__SCAMSTOP_CONTENT_LOADED__) {
             if (data.success && Array.isArray(data.highRiskUrls)) {
                 highlightMaliciousLinks(data.highRiskUrls.map(item => ({
                     url: item.url,
-                    reason: 'AI-detected threat',
-                    score: 100
+                    reasons: item.reasons && item.reasons.length > 0 ? item.reasons : ['Server-side detection flagged this link'],
+                    score: item.score || 100
                 })));
             }
         } catch (error) {
@@ -178,9 +259,9 @@ if (!window.__SCAMSTOP_CONTENT_LOADED__) {
         console.log("🔬 Using standalone analysis (no backend needed)");
 
         const riskyLinks = links
-            .map(url => {
-                const analysis = analyzeURLRisk(url);
-                return { url, ...analysis };
+            .map(link => {
+                const analysis = analyzeURLRisk(link.url);
+                return { url: link.url, ...analysis };
             })
             .filter(item => item.isRisky);
 

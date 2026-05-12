@@ -4,14 +4,6 @@ const session = require('express-session');  // ✅ Import express-session
 const mongoose = require('mongoose');
 const { connectDB } = require('./config/db');
 const authRouter = require('./routes/auth');
-const searchUri = require('./repos/webrisk');
-const { isLoggedIn } = require('./middleware/auth');
-const path = require('path');
-const MessageAnalyzer = require('./repos/image_analysis');
-const SentimentAnalyzer = require('./repos/sentiment_analysis');
-const UrlAnalyzer = require('./repos/url_analysis');
-const ScamMessageAnalyzer  = require('./repos/message_last_step')
-const { scamClassifier } = require('./repos/decision_tree_classifier');
 const urlRouter = require('./routes/bad_linksRouter');
 const imageRouter = require('./routes/image_analysis_router');
 
@@ -37,12 +29,15 @@ const corsOptions = {
             'chrome-extension://iagcokkhpnffadlppbbnodjmkkoiijln', // Chrome Extension
             'https://x.com' ,
             "https://web.whatsapp.com",
+            "https://web.telegram.org",
             "https://mail.google.com",
             "https://www.instagram.com",
-            "https://learn.microsoft.com"// ✅ Allow Twitter if needed
+            "https://web.snapchat.com",
+            "https://messenger.com",
+            "https://www.messenger.com"
         ];
 
-        if (!origin || allowedOrigins.includes(origin)) {
+        if (!origin || allowedOrigins.includes(origin) || origin.startsWith('chrome-extension://')) {
             return callback(null, true);
         }
 

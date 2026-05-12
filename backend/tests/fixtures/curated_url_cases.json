@@ -1,0 +1,102 @@
+[
+  {
+    "url": "https://paypal.com/security",
+    "expectedRisk": "Low",
+    "label": "official PayPal HTTPS page"
+  },
+  {
+    "url": "https://paypa1.com/security-alert",
+    "expectedRisk": "High",
+    "label": "PayPal typosquat"
+  },
+  {
+    "url": "https://paypal.com.security-check.xyz/login",
+    "expectedRisk": "High",
+    "label": "brand in deceptive subdomain"
+  },
+  {
+    "url": "http://amazon-billing-update.top/confirm",
+    "expectedRisk": "High",
+    "label": "HTTP brand impersonation with suspicious TLD"
+  },
+  {
+    "url": "https://bit.ly/verify-bank-account-now",
+    "expectedRisk": "High",
+    "label": "shortener hiding account verification link"
+  },
+  {
+    "url": "https://192.168.10.2/login/secure",
+    "expectedRisk": "High",
+    "label": "raw IP login URL"
+  },
+  {
+    "url": "https://xn--pple-43d.com/icloud/update",
+    "expectedRisk": "High",
+    "label": "punycode homograph"
+  },
+  {
+    "url": "https://secure-login-paypal-verify-account.com/session",
+    "expectedRisk": "High",
+    "label": "credential keyword stuffing"
+  },
+  {
+    "url": "https://microsoft.com/en-us/security",
+    "expectedRisk": "Low",
+    "label": "official Microsoft page"
+  },
+  {
+    "url": "https://support.microsoft.com.office-login.work/password-reset",
+    "expectedRisk": "High",
+    "label": "Microsoft support impersonation"
+  },
+  {
+    "url": "https://usps.com/track",
+    "expectedRisk": "Low",
+    "label": "official USPS tracking"
+  },
+  {
+    "url": "https://usps.delivery-update.click/claim?redirect=https%3A%2F%2Fusps.com",
+    "expectedRisk": "High",
+    "label": "USPS delivery lure with redirect"
+  },
+  {
+    "url": "https://google.com/account/about",
+    "expectedRisk": "Low",
+    "label": "official Google account help"
+  },
+  {
+    "url": "http://google.account-verify.download/password",
+    "expectedRisk": "High",
+    "label": "Google account phishing over HTTP"
+  },
+  {
+    "url": "https://apple.com/legal/privacy",
+    "expectedRisk": "Low",
+    "label": "official Apple page"
+  },
+  {
+    "url": "https://icloud-apple-support-reset-password.xyz",
+    "expectedRisk": "High",
+    "label": "Apple iCloud reset impersonation"
+  },
+  {
+    "url": "https://instagram.com/accounts/password/reset",
+    "expectedRisk": "Low",
+    "label": "official Instagram reset route"
+  },
+  {
+    "url": "https://instagram-login-help.security-alert.top/session",
+    "expectedRisk": "High",
+    "label": "Instagram login lure"
+  },
+  {
+    "url": "https://fedex.com/en-us/tracking.html",
+    "expectedRisk": "Low",
+    "label": "official FedEx page"
+  },
+  {
+    "url": "https://fedex-package-release.info/verify?token=abc123",
+    "expectedRisk": "High",
+    "label": "FedEx delivery phishing"
+  }
+]
