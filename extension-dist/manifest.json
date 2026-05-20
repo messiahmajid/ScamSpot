@@ -12,8 +12,7 @@
     "storage",
     "tabs",
     "scripting",
-    "activeTab",
-    "alarms"
+    "activeTab"
   ],
   "host_permissions": [
     "https://mail.google.com/*",
@@ -23,7 +22,8 @@
     "https://web.snapchat.com/*",
     "https://messenger.com/*",
     "http://localhost:3000/*",
-    "http://localhost:3002/*"
+    "http://localhost:3002/*",
+    "http://localhost:8080/*"
   ],
   "background": {
     "service_worker": "background.js"
@@ -36,7 +36,8 @@
         "https://web.telegram.org/*",
         "https://www.instagram.com/*",
         "https://web.snapchat.com/*",
-        "https://messenger.com/*"
+        "https://messenger.com/*",
+        "http://localhost:8080/*"
       ],
       "js": ["contentScript.js"],
       "run_at": "document_end"

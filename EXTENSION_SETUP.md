@@ -1,26 +1,24 @@
 # ScamSpot Chrome Extension - Setup Guide
 
 ## Overview
-ScamSpot is a Chrome extension that detects and flags potential scams in emails (Gmail), and chat platforms (WhatsApp, Telegram, Instagram, Snapchat, Facebook Messenger). It uses AI-powered analysis to identify suspicious links and phishing content.
+ScamSpot is a Chrome extension that detects and flags potential scams in emails (Gmail) and chat platforms (WhatsApp, Telegram, Instagram, Snapchat, Facebook Messenger). It works standalone with client-side heuristics, and optionally connects to a backend for AI-powered analysis.
 
-## Prerequisites
+## Quick Start (No Backend Needed)
 
-Before installing the extension, you need to set up the backend service:
+1. Open Chrome and navigate to `chrome://extensions/`
+2. Enable **Developer Mode** (toggle in the top-right corner)
+3. Click **"Load unpacked"**
+4. Select the `extension-dist` folder from this project
+5. Navigate to Gmail, WhatsApp, or any supported platform — scanning starts automatically
 
-### Backend Setup
+## Optional: Backend Setup
+
+The extension works fully standalone. For AI-powered analysis via OpenAI, Azure, and Google Safe Browsing, set up the backend:
 
 1. **Install Node.js** (v14 or higher)
-2. **Install MongoDB** and ensure it's running
-3. **Get API Keys** for:
-   - OpenAI API
-   - Azure Cognitive Services (Text Analytics)
-   - Google Safe Browsing API
-
-4. **Set up the included backend**:
+2. **Set up the backend**:
    ```bash
    cd backend
-
-   # Install dependencies
    npm install
 
    # Create .env file with your API keys
@@ -33,147 +31,57 @@ Before installing the extension, you need to set up the backend service:
    PORT=3000
    EOF
 
-   # Start the backend server
    npm start
    ```
 
-The backend should now be running on `http://localhost:3000`
+The extension auto-detects the backend. When connected, the popup shows "Backend Connected" and links are analyzed with both local heuristics and server-side AI.
 
-## Chrome Extension Installation
+## How It Works
 
-### Method 1: Load Unpacked Extension (Recommended for Development)
+### Automatic Scanning
+The extension automatically scans all links when you visit a supported platform. No need to click anything.
 
-1. **Build is ready** at `./extension-dist` directory in the project root
+### Supported Platforms
 
-2. **Open Chrome** and navigate to:
-   ```
-   chrome://extensions/
-   ```
+| Platform | URL Pattern | Status |
+|----------|-------------|--------|
+| Gmail | `mail.google.com` | Supported |
+| WhatsApp Web | `web.whatsapp.com` | Supported |
+| Telegram Web | `web.telegram.org` | Supported |
+| Instagram | `www.instagram.com` | Supported |
+| Snapchat Web | `web.snapchat.com` | Supported |
+| Messenger | `messenger.com` | Supported |
 
-3. **Enable Developer Mode** (toggle in the top-right corner)
+### What It Does
 
-4. **Click "Load unpacked"**
+- **Scans all links** on the page, caching results to avoid redundant work
+- **Flags risky links** with a red outline and warning badge (no layout-breaking inline styles)
+- **Shows a warning overlay** when you click a flagged link, with risk score, reasons, and options to block, continue, or report a false positive
+- **Detects phishing phrases** like "verify your account", "urgent action required", etc.
+- **Tracks scan stats** visible in the popup dashboard
 
-5. **Select the `extension-dist` folder** from this project:
-   ```
-   /path/to/ScamSpot/extension-dist
-   ```
+### Popup Dashboard
 
-6. The extension should now appear in your Chrome toolbar!
+Click the ScamSpot icon in your toolbar to see:
 
-### Method 2: Rebuild from Source
+- **Protection status** — Active/Inactive based on current tab
+- **Platform** — Which platform is being monitored
+- **Scan stats** — Total links scanned and flagged
+- **Last scan time**
+- **Scan Now** button for manual rescans
+- **Flagged URLs** — Recent risky links with risk scores
+- **Backend status** — Whether the backend server is connected
 
-If you want to modify the extension:
+### Warning Overlay
 
-```bash
-cd chrome-extension
-npm install
-npm run build
-```
+When you click a flagged link, a modal overlay appears with:
 
-Then load the `build` folder as described in Method 1.
-
-## How to Use ScamSpot
-
-### 1. **Start Monitoring**
-
-- Click the ScamSpot icon in your Chrome toolbar
-- The popup will open showing the monitoring dashboard
-- Click **"▶ Start Monitoring"** to begin scanning
-
-### 2. **Automatic Scanning**
-
-The extension automatically monitors these platforms:
-- ✅ Gmail (`mail.google.com`)
-- ✅ WhatsApp Web (`web.whatsapp.com`)
-- ✅ Telegram Web (`web.telegram.org`)
-- ✅ Instagram (`www.instagram.com`)
-- ✅ Snapchat Web (`web.snapchat.com`)
-- ✅ Facebook Messenger (`messenger.com`)
-
-### 3. **What It Does**
-
-When you visit any of the supported platforms:
-
-- **Scans all links** on the page automatically
-- **Highlights risky links** with red borders and warning indicators
-- **Captures screenshots** of suspicious content (last 5 stored)
-- **Detects phishing keywords** like "verify", "urgent", "password", "suspended"
-- **Shows alerts** in the popup dashboard
-
-### 4. **View Results**
-
-In the popup dashboard, you'll see:
-
-- **Recent Alerts**: Phishing detection warnings with risk levels
-- **Recent Captures**: Screenshots of monitored pages
-- **Keyword Occurrences**: Search for specific scam-related terms
-
-### 5. **Authentication (Optional)**
-
-For advanced features:
-- Click **"Sign in with Google"** in the popup
-- This enables additional backend analysis features
-
-## Features
-
-### 🛡️ Real-time Link Validation
-- Every link on monitored pages is checked against multiple databases
-- Uses Google Safe Browsing API, machine learning, and heuristic analysis
-
-### 🚨 Visual Warnings
-- Risky links are highlighted in **red** with warning tooltips
-- "⚠️ High-Risk Link" banners appear next to suspicious URLs
-
-### 📸 Screenshot Capture
-- Automatic screenshots every 12 seconds while monitoring
-- Helps document suspicious content
-
-### 🔍 Phishing Detection
-- Scans page content for common phishing keywords
-- Provides risk assessment (0-100%)
-
-### 💾 Local Storage
-- Settings, screenshots, and alerts stored locally
-- Privacy-focused: your data stays on your machine
-
-## Troubleshooting
-
-### Extension not loading
-- Make sure Developer Mode is enabled in `chrome://extensions/`
-- Verify all files are present in the `build` folder
-- Check browser console (F12) for errors
-
-### Backend connection errors
-- Ensure the backend is running on `http://localhost:3000`
-- Check that your `.env` file has all required API keys
-- Verify MongoDB is running
-
-### Links not being highlighted
-- Make sure monitoring is **started** (click the start button)
-- Check that you're on a supported platform (Gmail, WhatsApp, etc.)
-- Open the browser console (F12) and look for errors
-
-### "Failed to fetch" errors
-- The backend server must be running
-- Check CORS settings if using a different port
-- Verify network connectivity
-
-## API Endpoints Used
-
-The extension communicates with these backend endpoints:
-
-- `POST /validate-url` - Validates URLs for scam/phishing indicators
-- `POST /auth/google-login` - Google OAuth authentication
-- `GET /auth/profile` - Get user profile
-- `POST /auth/logout` - Logout user
-
-## Privacy & Security
-
-- ✅ All analysis happens on your local machine and backend
-- ✅ No data is sent to third parties (except API providers for analysis)
-- ✅ Screenshots and alerts are stored locally in Chrome storage
-- ✅ Only works on specified domains (Gmail, WhatsApp, etc.)
+- **Risk score** (color-coded: red for high, yellow for medium, green for low)
+- **The URL** being visited
+- **Reasons** the link was flagged
+- **Go Back to Safety** — close the overlay
+- **Continue Anyway** — open the link in a new tab
+- **Report False Positive** — whitelist the URL so it won't be flagged again
 
 ## Development
 
@@ -182,65 +90,59 @@ The extension communicates with these backend endpoints:
 ```
 ScamSpot/
 ├── extension-dist/             # Built extension (load this in Chrome)
-│   ├── manifest.json          # Extension configuration
-│   ├── background.js          # Service worker
-│   ├── contentScript.js       # Content script injected into pages
-│   ├── index.html             # Popup UI
-│   └── static/                # Compiled React app
-├── chrome-extension/          # Source code
+│   ├── manifest.json           # Extension configuration
+│   ├── background.js           # Service worker
+│   ├── contentScript.js        # Content script injected into pages
+│   ├── index.html              # Popup UI
+│   └── static/                 # Compiled React app
+├── chrome-extension/           # Source code
 │   ├── src/
-│   │   ├── App.tsx           # Main popup component
-│   │   └── context/
-│   │       └── ApiContext.tsx # State management
+│   │   ├── App.tsx             # Popup dashboard component
+│   │   ├── App.css             # Popup styles
+│   │   └── setupTests.ts       # Test setup with chrome API mocks
 │   └── public/
-│       ├── manifest.json      # Manifest source
-│       ├── background.js      # Background script
-│       └── contentScript.js   # Content script
-└── backend/                   # Backend service (from zip)
+│       ├── manifest.json       # Manifest source
+│       ├── background.js       # Background service worker
+│       └── contentScript.js    # Content script (scanning, cache, overlay)
+└── backend/                    # Optional backend service
 ```
 
 ### Making Changes
 
 1. Edit files in `chrome-extension/src/` or `chrome-extension/public/`
-2. Rebuild: `cd chrome-extension && npm run build`
-3. In Chrome, go to `chrome://extensions/` and click reload icon on ScamSpot
+2. Rebuild and sync to `extension-dist/`:
+   ```bash
+   cd chrome-extension
+   npm run build:dist
+   ```
+3. In Chrome, go to `chrome://extensions/` and click the reload icon on ScamSpot
 
-## Supported Platforms
+### Running Tests
 
-| Platform | URL Pattern | Status |
-|----------|-------------|--------|
-| Gmail | `mail.google.com` | ✅ Supported |
-| WhatsApp Web | `web.whatsapp.com` | ✅ Supported |
-| Telegram Web | `web.telegram.org` | ✅ Supported |
-| Instagram | `www.instagram.com` | ✅ Supported |
-| Snapchat Web | `web.snapchat.com` | ✅ Supported |
-| Messenger | `messenger.com` | ✅ Supported |
+```bash
+cd chrome-extension
+npm test
+```
 
-## Known Limitations
+## Troubleshooting
 
-- Maximum 5 screenshots stored at a time (oldest deleted)
-- Maximum 5 alerts stored at a time
-- Requires backend server to be running locally
-- Only works on specified domains
-- Screenshot capture interval is 12 seconds
+### Extension not loading
+- Make sure Developer Mode is enabled in `chrome://extensions/`
+- Check browser console (F12) for errors
 
-## Contributing
+### Links not being flagged
+- Make sure you're on a supported platform
+- Try clicking "Scan Now" in the popup
+- Open the browser console (F12) and look for ScamSpot log messages
 
-To contribute to ScamSpot:
+### Backend connection issues
+- Ensure the backend is running on `http://localhost:3000`
+- Check that your `.env` file has all required API keys
+- The extension works without the backend — standalone mode uses local heuristics
 
-1. Fork the repository
-2. Make your changes in the `chrome-extension/` folder
-3. Test thoroughly on all supported platforms
-4. Submit a pull request
+## Privacy
 
-## License
-
-See LICENSE file in the repository.
-
-## Support
-
-For issues or questions:
-- Check the browser console (F12) for error messages
-- Verify backend is running and accessible
-- Ensure all API keys are correctly configured
-- Review the troubleshooting section above
+- All local analysis happens entirely in your browser
+- No data is sent to third parties unless the backend is configured with external APIs
+- Scan results and settings are stored locally in Chrome storage
+- The extension only activates on specified domains

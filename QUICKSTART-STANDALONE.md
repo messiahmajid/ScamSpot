@@ -12,17 +12,16 @@
 
 ### Step 2: Start Protecting Yourself (10 seconds)
 
-1. Click the ScamSpot icon in Chrome toolbar
-2. Click **"▶ Start Monitoring"**
-3. Visit Gmail, WhatsApp Web, Instagram, or any supported platform
-4. ScamSpot will automatically scan and highlight risky links in **RED**
+1. Navigate to Gmail, WhatsApp Web, Instagram, or any supported platform
+2. ScamSpot automatically scans all links on the page
+3. Click the ScamSpot icon to see scan stats, flagged URLs, and trigger manual rescans
 
 ## ✅ You're Protected!
 
 The extension now works **completely standalone** with:
 - ✅ Real-time URL risk analysis (10+ security checks per link)
 - ✅ Phishing keyword detection
-- ✅ Visual warnings for dangerous links (red borders + tooltips)
+- ✅ Visual warnings for dangerous links (outline badges + warning overlay)
 - ✅ Click protection (warns before opening suspicious links)
 - ✅ Brand impersonation detection
 - ✅ Works offline - no internet connection needed for basic features!
@@ -83,7 +82,7 @@ The extension will **automatically detect** when the backend is running and enab
 - Enable Developer Mode in `chrome://extensions/`
 
 **Links not highlighting?**
-- Click "Start Monitoring" in the popup
+- Click "Scan Now" in the popup
 - Refresh the page you're monitoring
 - Make sure you're on a supported platform (Gmail, WhatsApp, etc.)
 

@@ -16,6 +16,7 @@
 
 # misc
 .idea/
+.claude/
 .DS_Store
 *.zip
 .env.local

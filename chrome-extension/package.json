@@ -3,7 +3,6 @@
   "version": "0.1.0",
   "private": true,
   "dependencies": {
-    "@react-oauth/google": "^0.12.1",
     "@testing-library/dom": "^10.4.0",
     "@testing-library/jest-dom": "^6.6.3",
     "@testing-library/react": "^16.2.0",
@@ -21,6 +20,7 @@
   "scripts": {
     "start": "react-scripts start",
     "build": "react-scripts build",
+    "build:dist": "react-scripts build && cp public/contentScript.js public/background.js public/manifest.json ../extension-dist/ && rm -rf ../extension-dist/static && cp -r build/static build/index.html build/asset-manifest.json ../extension-dist/",
     "test": "react-scripts test",
     "eject": "react-scripts eject"
   },

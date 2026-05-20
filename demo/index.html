@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ScamSpot Demo — Phishing Samples</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #f5f5f5; color: #1a1a1a; line-height: 1.6; }
+    .container { max-width: 720px; margin: 0 auto; padding: 32px 20px; }
+    h1 { font-size: 24px; margin-bottom: 4px; }
+    .subtitle { color: #666; margin-bottom: 32px; font-size: 14px; }
+    .section { background: #fff; border-radius: 8px; padding: 20px 24px; margin-bottom: 20px; box-shadow: 0 1px 3px rgba(0,0,0,0.08); }
+    .section h2 { font-size: 16px; margin-bottom: 12px; display: flex; align-items: center; gap: 8px; }
+    .section h2 .dot { width: 10px; height: 10px; border-radius: 50%; display: inline-block; }
+    .dot-red { background: #ef4444; }
+    .dot-green { background: #22c55e; }
+    .message { padding: 12px 0; border-bottom: 1px solid #f0f0f0; }
+    .message:last-child { border-bottom: none; }
+    .message .sender { font-weight: 600; font-size: 13px; color: #444; margin-bottom: 4px; }
+    .message p { font-size: 14px; color: #333; }
+    .message a { color: #2563eb; text-decoration: underline; word-break: break-all; }
+    .instructions { background: #fffbeb; border: 1px solid #fcd34d; border-radius: 8px; padding: 16px 20px; margin-bottom: 24px; font-size: 13px; color: #92400e; }
+    .instructions strong { display: block; margin-bottom: 4px; }
+    .tag { display: inline-block; font-size: 11px; padding: 2px 8px; border-radius: 4px; margin-left: 8px; font-weight: 500; }
+    .tag-scam { background: #fef2f2; color: #dc2626; }
+    .tag-safe { background: #f0fdf4; color: #16a34a; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>ScamSpot Demo</h1>
+    <p class="subtitle">Sample messages with a mix of phishing and legitimate links. ScamSpot should flag the red section and leave the green section alone.</p>
+
+    <div class="instructions">
+      <strong>How to use this demo</strong>
+      1. Load the ScamSpot extension in Chrome (extension-dist/ folder)<br>
+      2. Open this page at <code>http://localhost:8080</code><br>
+      3. Watch links get scanned automatically<br>
+      4. Click a flagged link to see the warning overlay<br>
+      5. Click the ScamSpot toolbar icon to see scan stats
+    </div>
+
+    <div class="section">
+      <h2><span class="dot dot-red"></span> Suspicious Links <span class="tag tag-scam">Should be flagged</span></h2>
+
+      <div class="message">
+        <div class="sender">PayPal Security Team</div>
+        <p>Your account has been limited. Verify immediately: <a href="http://paypa1-secure-login.xyz/verify-account">http://paypa1-secure-login.xyz/verify-account</a></p>
+      </div>
+
+      <div class="message">
+        <div class="sender">Apple Support</div>
+        <p>Your Apple ID was used to sign in on a new device. Confirm here: <a href="http://apple-id-verify.click/confirm-identity">http://apple-id-verify.click/confirm-identity</a></p>
+      </div>
+
+      <div class="message">
+        <div class="sender">Bank of America</div>
+        <p>Unusual activity detected. Secure your account: <a href="http://secure-bankofamerica-login.top/urgent-action">http://secure-bankofamerica-login.top/urgent-action</a></p>
+      </div>
+
+      <div class="message">
+        <div class="sender">Unknown Sender</div>
+        <p>You won a $500 gift card! Claim now: <a href="http://192.168.1.100/free-prize-claim">http://192.168.1.100/free-prize-claim</a></p>
+      </div>
+
+      <div class="message">
+        <div class="sender">Netflix Billing</div>
+        <p>Your payment method failed. Update billing info: <a href="http://netflix-account.billing-update.xyz/suspended">http://netflix-account.billing-update.xyz/suspended</a></p>
+      </div>
+
+      <div class="message">
+        <div class="sender">Amazon Orders</div>
+        <p>Track your package: <a href="http://amaz0n-order-tracking.click/shipment?id=8827361">http://amaz0n-order-tracking.click/shipment?id=8827361</a></p>
+      </div>
+    </div>
+
+    <div class="section">
+      <h2><span class="dot dot-green"></span> Legitimate Links <span class="tag tag-safe">Should not be flagged</span></h2>
+
+      <div class="message">
+        <div class="sender">Coworker</div>
+        <p>Here's the doc I mentioned: <a href="https://docs.google.com/document/d/example">https://docs.google.com/document/d/example</a></p>
+      </div>
+
+      <div class="message">
+        <div class="sender">Friend</div>
+        <p>Check out this article: <a href="https://en.wikipedia.org/wiki/Phishing">https://en.wikipedia.org/wiki/Phishing</a></p>
+      </div>
+
+      <div class="message">
+        <div class="sender">Team Lead</div>
+        <p>PR is ready for review: <a href="https://github.com/example/repo/pull/42">https://github.com/example/repo/pull/42</a></p>
+      </div>
+
+      <div class="message">
+        <div class="sender">Newsletter</div>
+        <p>Read more on our blog: <a href="https://www.nytimes.com/2024/01/01/technology">https://www.nytimes.com/2024/01/01/technology</a></p>
+      </div>
+    </div>
+  </div>
+</body>
+</html>
