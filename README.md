@@ -166,13 +166,6 @@ Evidence for the main claims:
 
 ScamSpot is a portfolio project, not commercial anti-phishing infrastructure. It can catch common phishing patterns and demonstrate resilient detector orchestration, but real-world production use would need stronger abuse controls, broader URL intelligence, deployment hardening, rate limiting, monitoring, and a reviewed privacy/security model.
 
-## Next Steps
-
-- Add README screenshots or a short GIF of the popup and warning overlay.
-- Add CI to run `npm run verify` on push.
-- Add rate limiting and request size limits to the backend.
-- Add deployment configuration for a hosted backend demo.
-- Expand curated phishing/benign fixtures from public datasets.
 
 ## Project Layout
 
