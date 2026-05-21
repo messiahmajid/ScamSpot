@@ -60,7 +60,20 @@ Backend detectors run independently with per-service timeout and retry handling.
 
 ## Setup
 
-### 1. Run The Extension Without Backend
+### Prerequisites
+
+- **Node.js 18+** and npm
+- **Google Chrome** or another Chromium browser that supports Manifest V3 extensions
+- **Python 3** for the local demo page server
+- **MongoDB** only if you want backend persistence locally
+- Optional API keys for advanced analysis: OpenAI, Azure Text Analytics, and Google Safe Browsing
+
+ScamSpot has two useful run modes:
+
+- **Standalone extension mode:** fastest path, no backend or API keys required.
+- **Advanced backend mode:** optional Express backend with external detectors and MongoDB persistence.
+
+### 1. Build The Loadable Extension
 
 ```bash
 cd chrome-extension
@@ -68,24 +81,50 @@ npm install
 npm run build:dist
 ```
 
-Then open Chrome:
+This compiles the React popup and syncs the Chrome extension bundle into `extension-dist/`. That folder is the one Chrome loads.
+
+### 2. Load The Extension In Chrome
 
 1. Go to `chrome://extensions/`
 2. Enable **Developer Mode**
 3. Click **Load unpacked**
 4. Select the `extension-dist/` folder
-5. Open Gmail, a supported chat app, or the local demo page
+5. Confirm the ScamSpot extension icon appears in Chrome
 
-### 2. Demo The Extension Locally
+If you change extension source files later, run `npm run build:dist` again and click the reload icon on the ScamSpot card in `chrome://extensions/`.
+
+### 3. Run The Fast Local Demo
 
 ```bash
 cd demo
 python3 -m http.server 8080
 ```
 
-Open `http://localhost:8080`. ScamSpot should flag the suspicious sample links and leave the benign links alone.
+Open `http://localhost:8080`.
 
-### 3. Run Advanced Backend Mode
+Expected result:
+
+- Suspicious sample links are outlined and badged by ScamSpot.
+- Benign sample links are left alone.
+- Clicking a flagged link opens the warning overlay with the risk score, reasons, and block/continue/report actions.
+- Opening the extension popup shows the current page as active, with scan totals and recent flagged URLs.
+
+This is the best demo path because it does not depend on Gmail content, login state, external APIs, or a live backend.
+
+### 4. Try Supported Real Platforms
+
+After the local demo works, open any supported site:
+
+- Gmail: `mail.google.com`
+- WhatsApp Web: `web.whatsapp.com`
+- Telegram Web: `web.telegram.org`
+- Instagram: `www.instagram.com`
+- Snapchat Web: `web.snapchat.com`
+- Messenger: `messenger.com`
+
+ScamSpot scans links automatically as the page loads and as new content appears. Use **Scan Now** in the popup to force a rescan after dynamic content loads.
+
+### 5. Run Advanced Backend Mode
 
 ```bash
 cd backend
@@ -94,7 +133,7 @@ cp .env.example .env
 npm start
 ```
 
-Add any optional API keys you want to enable in `backend/.env`:
+Edit `backend/.env` to enable whichever services you want to test:
 
 ```env
 PORT=3000
@@ -107,11 +146,19 @@ DETECTION_SERVICE_TIMEOUT_MS=3500
 DETECTION_SERVICE_RETRIES=1
 ```
 
-The extension auto-detects the backend via `/health`. When connected, the popup shows **Backend Connected** and content-script scans call `/validate-url`.
+The backend still runs without every optional key. Missing services return an unavailable/skipped status while the available detectors continue. This is intentional: one missing or slow upstream should not block the response path.
 
-### 4. Demo The Backend
+Health check:
 
-With the backend running:
+```bash
+curl http://localhost:3000/health
+```
+
+When the extension detects the backend, the popup shows **Backend Connected** and content-script scans call `/validate-url`.
+
+### 6. Demo The Backend Directly
+
+In a second terminal, with the backend still running:
 
 ```bash
 cd backend
@@ -119,6 +166,15 @@ npm run demo
 ```
 
 The demo posts phishing and benign URLs to `/validate-url` and prints risk scores, reasons, detector statuses, timings, and MongoDB persistence status.
+
+### Troubleshooting
+
+- **Extension does not appear:** reload `extension-dist/` from `chrome://extensions/`, not `chrome-extension/`.
+- **Popup says inactive:** open a supported platform or `http://localhost:8080`, then reopen the popup.
+- **Links are not highlighted:** click **Scan Now**, refresh the page, and confirm the page URL is one of the supported domains.
+- **Backend is disconnected:** confirm `npm start` is running in `backend/` and `http://localhost:3000/health` responds.
+- **MongoDB errors appear:** start MongoDB locally or leave `MONGO` empty if you only want detector output without persistence.
+- **API-key services are skipped:** add the relevant key to `backend/.env` and restart the backend.
 
 ## Verification
 
@@ -129,6 +185,12 @@ npm run verify
 ```
 
 This runs extension tests, rebuilds and syncs `extension-dist/`, and runs backend tests.
+
+Expected verification result:
+
+- `src/contentScript.test.ts` and `src/App.test.tsx` pass.
+- The production extension build completes and updates `extension-dist/`.
+- Backend tests pass, including detector resilience and 500+ adversarial URL scenarios.
 
 Evidence for the main claims:
 
