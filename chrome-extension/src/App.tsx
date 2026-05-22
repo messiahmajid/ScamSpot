@@ -34,6 +34,11 @@ function timeAgo(ts: number): string {
     return Math.floor(diff / 3600000) + 'h ago';
 }
 
+function hostnameFromUrl(url: string): string {
+    try { return new URL(url).hostname; }
+    catch { return url; }
+}
+
 function App() {
     const [stats, setStats] = useState<ScanStats>({
         totalScanned: 0, totalFlagged: 0, lastScanTime: 0, platform: 'unknown', flaggedUrls: []
@@ -100,67 +105,92 @@ function App() {
     };
 
     const isProtected = !!currentPlatform;
+    const flaggedCount = stats.totalFlagged || 0;
+    const scannedCount = stats.totalScanned || 0;
+    const reviewCount = stats.flaggedUrls?.length || 0;
+    const hasFlaggedUrls = reviewCount > 0;
+    const riskState = flaggedCount > 0 ? 'Review needed' : 'Clear';
+    const riskClass = flaggedCount > 0 ? 'elevated' : 'clear';
+    const scanButtonLabel = scanning ? 'Scanning' : 'Scan now';
 
     return (
         <div className="popup">
             <header className="popup-header">
                 <div className="popup-brand">
-                    <span className="popup-shield">{'\u{1F6E1}'}️</span>
-                    <h1>ScamSpot</h1>
+                    <span className="popup-mark" aria-hidden="true">
+                        <span className="popup-mark-core">S</span>
+                    </span>
+                    <div>
+                        <h1>ScamSpot</h1>
+                        <p>Phishing link console</p>
+                    </div>
                 </div>
                 <span className={'popup-status ' + (isProtected ? 'active' : 'inactive')}>
                     {isProtected ? 'Active' : 'Inactive'}
                 </span>
             </header>
 
-            {currentPlatform && (
-                <div className="popup-platform">
-                    Monitoring: <strong>{currentPlatform}</strong>
+            <section className="surface-panel" aria-label="Current protection status">
+                <div className="platform-row">
+                    <span className="meta-label">Surface</span>
+                    <strong>{currentPlatform || 'Unsupported page'}</strong>
                 </div>
-            )}
+                <p className="platform-note">
+                    {currentPlatform
+                        ? 'Scanning links on this tab as content changes.'
+                        : 'Open Gmail, a supported chat app, or the local demo page.'}
+                </p>
+            </section>
 
-            {!currentPlatform && (
-                <div className="popup-platform">
-                    Navigate to a supported platform to start scanning
+            <section className="risk-panel" aria-label="Scan summary">
+                <div className={'risk-dial ' + riskClass}>
+                    <span className="risk-dial-label">{riskState}</span>
+                    <strong>{flaggedCount}</strong>
+                    <span>flagged</span>
                 </div>
-            )}
-
-            <div className="popup-stats">
-                <div className="stat">
-                    <div className="stat-value">{stats.totalScanned}</div>
-                    <div className="stat-label">Scanned</div>
-                </div>
-                <div className="stat">
-                    <div className={'stat-value' + (stats.totalFlagged > 0 ? ' flagged' : '')}>
-                        {stats.totalFlagged}
+                <div className="scan-metrics">
+                    <div className="stat">
+                        <div className="stat-value">{scannedCount}</div>
+                        <div className="stat-label">Scanned</div>
                     </div>
-                    <div className="stat-label">Flagged</div>
+                    <div className="stat">
+                        <div className="stat-value">{reviewCount}</div>
+                        <div className="stat-label">In queue</div>
+                    </div>
+                    <div className="stat meta-stat">
+                        <div className="stat-value small">{timeAgo(stats.lastScanTime)}</div>
+                        <div className="stat-label">Last scan</div>
+                    </div>
                 </div>
-            </div>
-
-            <div className="popup-meta">
-                Last scan: {timeAgo(stats.lastScanTime)}
-            </div>
+            </section>
 
             <button
-                className="popup-scan-btn"
+                className={'popup-scan-btn' + (scanning ? ' is-loading' : '')}
                 onClick={handleRescan}
                 disabled={scanning || !isProtected}
+                aria-busy={scanning}
             >
-                {scanning ? 'Scanning...' : 'Scan Now'}
+                <span className="scan-icon" aria-hidden="true" />
+                <span>{scanButtonLabel}</span>
             </button>
 
-            {stats.flaggedUrls?.length > 0 && (
-                <div className="popup-flagged">
-                    <h3>Flagged URLs</h3>
+            <section className="popup-flagged" aria-label="Flagged URLs">
+                <div className="section-heading">
+                    <h2>Flagged URLs</h2>
+                    <span>{hasFlaggedUrls ? `${reviewCount} recent` : 'None'}</span>
+                </div>
+
+                {hasFlaggedUrls ? (
                     <ul>
                         {stats.flaggedUrls.slice(-5).reverse().map((item, i) => {
-                            let hostname: string;
-                            try { hostname = new URL(item.url).hostname; }
-                            catch { hostname = item.url; }
+                            const hostname = hostnameFromUrl(item.url);
+                            const reason = item.reasons[0] || 'Suspicious link pattern';
                             return (
                                 <li key={i} title={item.reasons.join(', ')}>
-                                    <span className="flagged-url">{hostname}</span>
+                                    <span className="flagged-copy">
+                                        <span className="flagged-url">{hostname}</span>
+                                        <span className="flagged-reason">{reason}</span>
+                                    </span>
                                     <span className={'flagged-score ' + (item.score >= 70 ? 'high' : 'medium')}>
                                         {item.score}%
                                     </span>
@@ -168,8 +198,10 @@ function App() {
                             );
                         })}
                     </ul>
-                </div>
-            )}
+                ) : (
+                    <p className="empty-state">No risky links are waiting for review.</p>
+                )}
+            </section>
 
             <footer className="popup-footer">
                 <span className={'backend-status ' + (backendAvailable ? 'connected' : '')}>
